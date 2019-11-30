@@ -16,7 +16,7 @@
     (incident)->component - 2.f * angle * (normal)->component
 
 #define RES_MULT 1000000.f
-#define PARTICLE_DIR_MAX  5
+#define PARTICLE_DIR_MAX 200
 #define START_POS_MAX RES_MULT / 2
 #define START_POS_MIN 500l
 #define TRANSLATION_SPEED 0.000021f
