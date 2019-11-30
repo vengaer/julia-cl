@@ -1,21 +1,24 @@
 #include "cmpxchg.h"
+#include "delta_time.h"
 #include "graphics.h"
+#include "julia.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <sys/time.h>
 
 #define IGNORE(x) (void)(x)
 
 #define BYTESIZE(buf) \
     sizeof((buf)) * sizeof((buf[0]))
 
-static char const *vert_shader_source = 
+static char const *vert_shader_source =
     #include "shader/basic.vert"
         ;
-static char const *fragl_shader_source = 
+static char const *fragl_shader_source =
     #include "shader/basic.frag"
         ;
 
@@ -35,8 +38,11 @@ static const GLuint indices[] = {
 };
 
 static uint32_t volatile win_width, win_height;
+static uint32_t volatile fb_width, fb_height;
 static GLuint vao, vbo, idx_buf;
 
+static struct timeval delta_start, delta_stop;
+static float delta_time;
 
 static inline bool compilation_successful(GLuint id) {
     GLint result;
@@ -161,15 +167,18 @@ static bool setup_shaders(void) {
     return true;
 }
 
-void window_size_callback(GLFWwindow *win, int w, int h) {
+static void window_size_callback(GLFWwindow *win, int w, int h) {
     IGNORE(win);
     atomic_writeu32(&win_width, w);
     atomic_writeu32(&win_height, h);
 }
 
-void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
+static void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
     IGNORE(win);
     glViewport(0, 0, width, height);
+    (void)julia_update_dims(width, height);
+    atomic_writeu32(&fb_width, width);
+    atomic_writeu32(&fb_height, height);
 }
 
 bool gl_create_window(uint32_t width, uint32_t height) {
@@ -200,6 +209,8 @@ bool gl_create_window(uint32_t width, uint32_t height) {
     glClearColor(1.0, 1.0, 1.0, 1.0);
     glfwSetWindowSizeCallback(window, window_size_callback);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+
+    glfwGetFramebufferSize(window, (int*)&fb_width, (int*)&fb_height);
 
     return true;
 }
@@ -239,13 +250,13 @@ void gl_update_texture(unsigned char *texdata) {
 
     glBindTexture(GL_TEXTURE_2D, texid);
     if(win_width != width || win_height != height) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb_width, fb_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
 
         width = win_width;
         height = win_height;
     }
     else {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, texdata);
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fb_width, fb_height, GL_RGB, GL_UNSIGNED_BYTE, texdata);
     }
     glBindTexture(GL_TEXTURE_2D, 0);
 }
@@ -261,3 +272,19 @@ void gl_render(void) {
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 
+void gl_framebuffer_size(uint32_t *width, uint32_t *height) {
+    *width = fb_width;
+    *height = fb_height;
+}
+
+void gl_delta_tick(void) {
+    delta_tick(&delta_start, &delta_stop, &delta_time);
+}
+
+float gl_delta_time(void) {
+    return 1.f / (delta_time * 1000.f);
+}
+
+unsigned gl_fps(void) {
+    return 1.f / gl_delta_time();
+}
