@@ -2,7 +2,7 @@ image: archlinux/base:latest
 
 before_script:
     - pacman --noconfirm -Syu
-    - pacman --noconfirm --needed -S gcc clang make mesa opencl-mesa ocl-icd opencl-headers libx11 glfw-x11 glew
+    - pacman --noconfirm --needed -S gcc make mesa opencl-mesa ocl-icd opencl-headers libx11 glfw-x11 glew
 
 stages:
     - build
