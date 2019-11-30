@@ -146,7 +146,6 @@ bool julia_init(unsigned iters) {
         return false;
     }
     if(!build_program()) {
-        clReleaseProgram(program);
         clReleaseContext(context);
         return false;
     }
