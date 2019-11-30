@@ -1,3 +1,4 @@
+#include "cmpxchg.h"
 #include "display.h"
 #include "graphics.h"
 #include "julia.h"
@@ -22,6 +23,10 @@ void signal_handler(int signal) {
 
 int main(void) {
     unsigned width, height;
+
+    if(!CMPXCHG_LOCK_FREE) {
+        CMPXCHG_INIT(void);
+    }
 
     if(!display_get_resolution(&width, &height)) {
         return 1;
@@ -79,6 +84,10 @@ int main(void) {
     if(!particle_join()) {
         fputs("Failed to join particle thread", stderr);
         return 1;
+    }
+
+    if(!CMPXCHG_LOCK_FREE) {
+        CMPXCHG_CLEANUP(void);
     }
 
     return 0;
