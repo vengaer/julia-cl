@@ -1,5 +1,7 @@
+#include "cmpxchg.h"
 #include "graphics.h"
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -33,7 +35,7 @@ static const GLuint indices[] = {
     1, 2, 3
 };
 
-static unsigned volatile win_width, win_height;
+static uint32_t volatile win_width, win_height;
 static GLuint vao, vbo, idx_buf;
 
 
@@ -164,9 +166,8 @@ static bool setup_shaders(void) {
 
 void window_size_callback(GLFWwindow *win, int w, int h) {
     IGNORE(win);
-    win_width = w;
-    win_height = h;
-    printf("%ux%u\n", win_width, win_height);
+    atomic_writeu32(&win_width, w);
+    atomic_writeu32(&win_height, h);
 }
 
 void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
@@ -175,8 +176,8 @@ void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
 }
 
 bool gl_create_window(unsigned width, unsigned height) {
-    win_width = width;
-    win_height = height;
+    atomic_writeu32(&win_width, width);
+    atomic_writeu32(&win_height, height);
     glViewport(0, 0, width, height);
 
     if(!glfwInit()) {
@@ -245,7 +246,6 @@ void gl_update_texture(unsigned char *texdata) {
 
         width = win_width;
         height = win_height;
-
     }
     else {
         glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, texdata);
