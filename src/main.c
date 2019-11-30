@@ -1,3 +1,4 @@
+#include "display.h"
 #include "graphics.h"
 #include "particle.h"
 
@@ -7,7 +8,6 @@
 
 #include <pthread.h>
 #include <signal.h>
-#include <X11/Xlib.h>
 
 bool volatile interrupted = false;
 
@@ -17,35 +17,10 @@ void signal_handler(int signal) {
     }
 }
 
-static bool get_resolution(unsigned *width, unsigned *height) {
-    Display *dsp = NULL;
-    Screen *scr = NULL;
-
-    dsp = XOpenDisplay(NULL);
-
-    if(!dsp) {
-        fputs("Failed to get display\n", stderr);
-        return false;
-    }
-
-    scr = DefaultScreenOfDisplay(dsp);
-
-    if(!scr) {
-        fputs("Failed to get screen\n", stderr);
-        XCloseDisplay(dsp);
-        return false;
-    }
-
-    *width = scr->width;
-    *height = scr->height;
-    XCloseDisplay(dsp);
-    return true;
-} 
-
 int main(void) {
     unsigned width, height;
 
-    if(!get_resolution(&width, &height)) {
+    if(!display_get_resolution(&width, &height)) {
         return 1;
     }
     printf("Window resolution: %ux%u\n", width, height);
@@ -73,8 +48,11 @@ int main(void) {
         return 1;
     }
 
+    struct complexptf p;
     while(!interrupted && !gl_window_should_close()) {
         gl_clear();
+        //p = particle_position();
+        //complexptf_print(&p);
         gl_render();
         gl_update_texture(texdata);
         gl_update();
