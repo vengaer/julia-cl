@@ -8,7 +8,7 @@ BUILD_DIR    := build
 SRC_EXT      := c
 OBJ_EXT      := o
 CFLAGS       := -std=gnu11 -Wall -Wextra -pedantic -Wshadow -Wunknown-pragmas
-LIB          := -lGLEW -lglfw -lGL -lm -lX11 -lpthread -ldl
+LIB          := -lGLEW -lglfw -lGL -lm -lX11 -lpthread -ldl -lOpenCL
 INC          := $(foreach d, $(INC_DIRS), -I$d)
 
 SRC          := $(shell find $(SRC_DIR) -mindepth 1 -type f -name "*.$(SRC_EXT)")
