@@ -33,47 +33,45 @@ int main(void) {
     }
     printf("Window resolution: %ux%u\n", width, height);
 
-    unsigned char *texdata = malloc(width * height * 3 * sizeof(unsigned char));
-
-    if(!gl_create_window(width, height)) {
-        free(texdata);
-        return 1;
-    }
 
     if(!julia_init(MAX_ITERS)) {
-        free(texdata);
         return 1;
     }
 
-    if(!gl_init(texdata)) {
-		free(texdata);
+    if(!gl_create_window(width, height)) {
+        julia_cleanup();
+        return 1;
+    }
+
+    if(!gl_init()) {
+        gl_terminate();
         julia_cleanup();
 		return 1;
 	}
 
     if(!particle_spawn()) {
         fputs("Failed to spawn particle thread", stderr);
-        free(texdata);
+        gl_terminate();
         julia_cleanup();
         return 1;
     }
 
-
+    unsigned char *texdata = malloc(width * height * 3 * sizeof(unsigned char));
     struct complexptf ppos;
 
     while(!interrupted && !gl_window_should_close()) {
-        gl_clear();
-        gl_render();
-
         ppos = particle_position();
 
         julia_update_constant(&ppos);
         julia_run_kernel(texdata);
 
+        gl_clear();
+        gl_update_texture(texdata);
+
         gl_delta_tick();
         printf("fps: %u       \r", gl_fps());
 
-        gl_update_texture(texdata);
+        gl_render();
         gl_update();
     }
 

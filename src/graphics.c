@@ -41,6 +41,8 @@ static uint32_t volatile win_width, win_height;
 static uint32_t volatile fb_width, fb_height;
 static GLuint vao, vbo, idx_buf;
 
+static bool data_initialized = false;
+
 static struct timeval delta_start, delta_stop;
 static float delta_time;
 
@@ -108,12 +110,10 @@ static void cleanup_renderer(void) {
     glDeleteBuffers(1, &idx_buf);
 }
 
-static void create_texture(unsigned char *texdata) {
+static void create_texture(void) {
 
     glGenTextures(1, &texid);
     glBindTexture(GL_TEXTURE_2D, texid);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -203,6 +203,7 @@ bool gl_create_window(uint32_t width, uint32_t height) {
 
     if(glewInit() != GLEW_OK) {
         fputs("Failed to initialize glew\n", stderr);
+        gl_terminate();
         return false;
     }
 
@@ -216,9 +217,11 @@ bool gl_create_window(uint32_t width, uint32_t height) {
 }
 
 void gl_terminate(void) {
-    glDeleteProgram(shaderid);
-    cleanup_renderer();
-    destroy_texture();
+    if(data_initialized) {
+        glDeleteProgram(shaderid);
+        cleanup_renderer();
+        destroy_texture();
+    }
     glfwTerminate();
     glfwDestroyWindow(window);
 }
@@ -236,12 +239,13 @@ void gl_update(void) {
     glfwPollEvents();
 }
 
-bool gl_init(unsigned char *texdata) {
+bool gl_init() {
     if(!setup_shaders()) {
         return false;
     }
-    create_texture(texdata);
+    create_texture();
     setup_renderer();
+    data_initialized = true;
     return true;
 }
 
