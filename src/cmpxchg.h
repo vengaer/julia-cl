@@ -5,19 +5,19 @@
 
 #if defined i386 || defined __i386__ || defined __x86_64__
 
-#define CMPXCHG32_ASM(addr, oldv, newv)                     \
+#define CMPXCHG_ASM(addr, oldv, newv)                       \
     asm volatile ("lock; cmpxchg %2, %1"                    \
                   : "=a"((oldv))                            \
                   : "m"(*(addr)), "r"((newv)), "a"((oldv))  \
                   : "memory" )
 
 static inline int32_t cmpxchg32(int32_t *addr, int32_t oldv, int32_t newv) {
-    CMPXCHG32_ASM(addr, oldv, newv);
+    CMPXCHG_ASM(addr, oldv, newv);
     return oldv;
 }
 
 static inline uint32_t cmpxchgu32(uint32_t *addr, uint32_t oldv, uint32_t newv) {
-    CMPXCHG32_ASM(addr, oldv, newv);
+    CMPXCHG_ASM(addr, oldv, newv);
     return oldv;
 }
 
