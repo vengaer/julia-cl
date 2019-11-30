@@ -50,7 +50,7 @@ int main(void) {
 
     unsigned char *texdata = malloc(width * height * 3 * sizeof(unsigned char));
 
-    if(!g_create_window(width, height)) {
+    if(!gl_create_window(width, height)) {
         free(texdata);
         return 1;
     }
@@ -60,21 +60,20 @@ int main(void) {
 		texdata[i + 1] = 0;
 		texdata[i + 2] = 0;
 	}
-    if(!g_init(texdata)) {
+    if(!gl_init(texdata)) {
 		free(texdata);
 		return 1;
 	}
 
 
-    while(!interrupted && !g_window_should_close()) {
-        g_clear();
-        g_render();
-        /* TODO: Create tex buffer */
-        g_update_texture(texdata);
-        g_update();
+    while(!interrupted && !gl_window_should_close()) {
+        gl_clear();
+        gl_render();
+        gl_update_texture(texdata);
+        gl_update();
     }
 
-    g_terminate();
+    gl_terminate();
     free(texdata);
 
     return 0;

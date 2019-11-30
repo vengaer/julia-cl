@@ -3,15 +3,15 @@
 
 #include <stdbool.h>
 
-bool g_create_window(unsigned width, unsigned height);
-void g_terminate(void);
-bool g_window_should_close(void);
-void g_clear(void);
-void g_update(void);
+bool gl_create_window(unsigned width, unsigned height);
+void gl_terminate(void);
+bool gl_window_should_close(void);
+void gl_clear(void);
+void gl_update(void);
 
-bool g_init(unsigned char *texdata);
-void g_update_texture(unsigned char *texdata);
-void g_render(void);
+bool gl_init(unsigned char *texdata);
+void gl_update_texture(unsigned char *texdata);
+void gl_render(void);
 
 
 #endif

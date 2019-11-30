@@ -14,7 +14,7 @@
 static char const *vert_shader_source = 
     #include "shader/basic.vert"
         ;
-static char const *frag_shader_source = 
+static char const *fragl_shader_source = 
     #include "shader/basic.frag"
         ;
 
@@ -33,7 +33,7 @@ static const GLuint indices[] = {
     1, 2, 3
 };
 
-static unsigned win_width, win_height;
+static unsigned volatile win_width, win_height;
 static GLuint vao, vbo, idx_buf;
 
 
@@ -53,7 +53,7 @@ static inline bool compilation_successful(GLuint id) {
     return true;
 }
 
-static inline bool linking_successful(void) {
+static inline bool linkingl_successful(void) {
     GLint result;
     int info_len;
 
@@ -135,7 +135,7 @@ static bool setup_shaders(void) {
         return false;
     }
 
-    glShaderSource(fragid, 1, &frag_shader_source, NULL);
+    glShaderSource(fragid, 1, &fragl_shader_source, NULL);
     glCompileShader(fragid);
 
     if(!compilation_successful(fragid)) {
@@ -154,7 +154,7 @@ static bool setup_shaders(void) {
     glDeleteShader(vertid);
     glDeleteShader(fragid);
 
-    if(!linking_successful()) {
+    if(!linkingl_successful()) {
         glDeleteProgram(shaderid);
         return false;
     }
@@ -174,7 +174,7 @@ void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-bool g_create_window(unsigned width, unsigned height) {
+bool gl_create_window(unsigned width, unsigned height) {
     win_width = width;
     win_height = height;
     glViewport(0, 0, width, height);
@@ -206,7 +206,7 @@ bool g_create_window(unsigned width, unsigned height) {
     return true;
 }
 
-void g_terminate(void) {
+void gl_terminate(void) {
     glDeleteProgram(shaderid);
     cleanup_renderer();
     destroy_texture();
@@ -214,20 +214,20 @@ void g_terminate(void) {
     glfwDestroyWindow(window);
 }
 
-bool g_window_should_close(void) {
+bool gl_window_should_close(void) {
     return glfwWindowShouldClose(window);
 }
 
-void g_clear(void) {
+void gl_clear(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-void g_update(void) {
+void gl_update(void) {
     glfwSwapBuffers(window);
     glfwPollEvents();
 }
 
-bool g_init(unsigned char *texdata) {
+bool gl_init(unsigned char *texdata) {
     if(!setup_shaders()) {
         return false;
     }
@@ -236,12 +236,24 @@ bool g_init(unsigned char *texdata) {
     return true;
 }
 
-void g_update_texture(unsigned char *texdata) {
-    destroy_texture();
-    create_texture(texdata);
+void gl_update_texture(unsigned char *texdata) {
+    static unsigned width = 0, height = 0;
+
+    glBindTexture(GL_TEXTURE_2D, texid);
+    if(win_width != width || win_height != height) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, win_width, win_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
+
+        width = win_width;
+        height = win_height;
+
+    }
+    else {
+        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, win_width, win_height, GL_RGB, GL_UNSIGNED_BYTE, texdata);
+    }
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void g_render(void) {
+void gl_render(void) {
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texid);
     glUseProgram(shaderid);
