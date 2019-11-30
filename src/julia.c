@@ -9,8 +9,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include <CL/cl.h>
-
 #define WG_SIZE 256
 
 static char const *cl_source =
