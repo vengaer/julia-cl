@@ -1,4 +1,5 @@
 #include "cmpxchg.h"
+#include "delta_time.h"
 #include "julia.h"
 #include "particle.h"
 
@@ -34,12 +35,6 @@ static struct {
     struct complexpti pos;
     struct complexpti dir;
 } particle;
-
-static void update_delta_time(void) {
-    gettimeofday(&delta_stop, NULL);
-    delta_time = ((delta_stop.tv_sec - delta_start.tv_sec) * 1000000.f + delta_stop.tv_usec - delta_start.tv_usec) / 1000.f;
-    delta_start = delta_stop;
-}
 
 static struct complexptf complexpti2f(struct complexpti const *i) {
     struct complexptf f = {
@@ -95,7 +90,7 @@ static void *handle_particle(void *args) {
     IGNORE(args);
 
     while(particle_alive) {
-        update_delta_time();
+        delta_tick(&delta_start, &delta_stop, &delta_time);
         move();
         usleep(SLEEP_MICRO);
     }
@@ -105,7 +100,7 @@ static void *handle_particle(void *args) {
 bool particle_spawn(void) {
     srand(time(NULL));
     
-    /* Ensure particle isn't spawned on on of the coordinate axes */
+    /* Ensure particle isn't spawned on one of the coordinate axes */
     do {
         particle.dir.re = rand32_in_range(-PARTICLE_DIR_MAX, PARTICLE_DIR_MAX);
         particle.dir.im = rand32_in_range(-PARTICLE_DIR_MAX, PARTICLE_DIR_MAX);
