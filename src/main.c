@@ -24,10 +24,6 @@ void signal_handler(int signal) {
 int main(void) {
     unsigned width, height;
 
-    if(!CMPXCHG_LOCK_FREE) {
-        CMPXCHG_INIT(void);
-    }
-
     if(!display_get_resolution(&width, &height)) {
         return 1;
     }
@@ -49,10 +45,23 @@ int main(void) {
 		return 1;
 	}
 
+    if(!CMPXCHG_LOCK_FREE) {
+        if(!CMPXCHG_INIT(void)) {
+            fputs("Failed to initialize lock-based cmpxchg\n", stderr);
+            gl_terminate();
+            julia_cleanup();
+            return 1;
+        }
+    }
+
+
     if(!particle_spawn()) {
-        fputs("Failed to spawn particle thread", stderr);
+        fputs("Failed to spawn particle thread\n", stderr);
         gl_terminate();
         julia_cleanup();
+        if(!CMPXCHG_LOCK_FREE) {
+            CMPXCHG_CLEANUP(void);
+        }
         return 1;
     }
 
@@ -79,13 +88,12 @@ int main(void) {
     free(texdata);
     julia_cleanup();
 
-    if(!particle_join()) {
-        fputs("Failed to join particle thread", stderr);
-        return 1;
-    }
-
     if(!CMPXCHG_LOCK_FREE) {
         CMPXCHG_CLEANUP(void);
+    }
+
+    if(!particle_join()) {
+        fputs("Failed to join particle thread\n", stderr);
     }
 
     return 0;

@@ -6,7 +6,7 @@
 #if defined i386 || defined __i386__ || defined __x86__ || defined __x86_64__
 
 #define CMPXCHG_LOCK_FREE 1
-#define CMPXCHG_INIT(discarded)
+#define CMPXCHG_INIT(discarded) 1
 #define CMPXCHG_CLEANUP(discarded)
 
 #define CMPXCHG_ASM(addr, oldv, newv)                       \
@@ -29,9 +29,10 @@ static inline uint32_t cmpxchgu32(uint32_t volatile *addr, uint32_t oldv, uint32
 #define CMPXCHG_LOCK_FREE 0
 #define CMPXCHG_INIT(discarded) cmpxchg_init()
 #define CMPXCHG_CLEANUP(discarded) cmpxchg_cleanup()
+#include <stdbool.h>
 
-void cmpxchg_init(void);
-void cmpxchg_cleanup(void);
+bool cmpxchg_init(void);
+bool cmpxchg_cleanup(void);
 int32_t cmpxchg32(int32_t volatile *addr, int32_t oldv, int32_t newv);
 uint32_t cmpxchgu32(uint32_t volatile *addr, uint32_t oldv, uint32_t newv);
 

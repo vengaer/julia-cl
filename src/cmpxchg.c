@@ -2,17 +2,16 @@
 
 #if CMPXCHG_LOCK_FREE == 0
 #warning Hardware cmpxchg not available
-#include <stdbool.h>
 #include <pthread.h>
 
 static pthread_mutex_t lock;
 
-void cmpxchg_init(void) {
-    pthread_mutex_init(&lock, NULL);
+bool cmpxchg_init(void) {
+    return pthread_mutex_init(&lock, NULL) == 0;
 }
 
-void cmpxchg_cleanup(void) {
-    pthread_mutex_destroy(&lock);
+bool cmpxchg_cleanup(void) {
+    return pthread_mutex_destroy(&lock) == 0;
 }
 
 int32_t cmpxchg32(int32_t volatile *addr, int32_t oldv, int32_t newv) {
