@@ -1,5 +1,6 @@
 #include "display.h"
 #include "graphics.h"
+#include "julia.h"
 #include "particle.h"
 
 #include <stdbool.h>
@@ -8,6 +9,8 @@
 
 #include <pthread.h>
 #include <signal.h>
+
+#define MAX_ITERS 1024
 
 bool volatile interrupted = false;
 
@@ -32,34 +35,46 @@ int main(void) {
         return 1;
     }
 
-	for(unsigned i = 0; i < width * height * 3; i += 3) {
-		texdata[i] = 255;
-		texdata[i + 1] = 0;
-		texdata[i + 2] = 0;
-	}
+    if(!julia_init(MAX_ITERS)) {
+        free(texdata);
+        return 1;
+    }
+
     if(!gl_init(texdata)) {
 		free(texdata);
+        julia_cleanup();
 		return 1;
 	}
 
     if(!particle_spawn()) {
         fputs("Failed to spawn particle thread", stderr);
         free(texdata);
+        julia_cleanup();
         return 1;
     }
 
-    struct complexptf p;
+
+    struct complexptf ppos;
+
     while(!interrupted && !gl_window_should_close()) {
         gl_clear();
-        //p = particle_position();
-        //complexptf_print(&p);
         gl_render();
+
+        ppos = particle_position();
+
+        julia_update_constant(&ppos);
+        julia_run_kernel(texdata);
+
+        gl_delta_tick();
+        printf("FPS: %u     \r", gl_fps());
+
         gl_update_texture(texdata);
         gl_update();
     }
 
     gl_terminate();
     free(texdata);
+    julia_cleanup();
 
     if(!particle_join()) {
         fputs("Failed to join particle thread", stderr);
