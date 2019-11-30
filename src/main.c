@@ -66,7 +66,7 @@ int main(void) {
         julia_run_kernel(texdata);
 
         gl_delta_tick();
-        printf("FPS: %u     \r", gl_fps());
+        printf("fps: %u     \r", gl_fps());
 
         gl_update_texture(texdata);
         gl_update();
