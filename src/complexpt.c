@@ -1,6 +1,7 @@
 #include "complexpt.h"
 
 #include <math.h>
+#include <stdio.h>
 
 float complexptf_dist(struct complexptf const *p1, struct complexptf const *p2) {
     float d_re = p1->re - p2->re;
@@ -20,4 +21,9 @@ void complexptf_normalize(struct complexptf *p) {
     float magnitude = complexptf_magnitude(p);
     p->re /= magnitude;
     p->im /= magnitude;
+}
+
+void complexptf_print(struct complexptf const *p) {
+    char sign = p->im < 0.f ? '-' : '+';
+    printf("%f %c %fi\n", p->re, sign, fabs(p->im));
 }
