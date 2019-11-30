@@ -1,4 +1,4 @@
-image :archlinux/base:latest
+image: archlinux/base:latest
 
 before_script:
     - pacman --noconfirm -Syu
