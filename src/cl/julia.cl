@@ -1,6 +1,6 @@
 R"(
     unsigned char compute_color(unsigned i, unsigned iters, unsigned mult) {
-        unsigned c = 255 * mult * i / iters;
+        int c = 255 * mult * i / iters;
         /* Wrap if too big */
         if(c > 255) {
             c = 255 - c;
