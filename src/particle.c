@@ -19,7 +19,7 @@
 #define PARTICLE_DIR_MAX  5
 #define START_POS_MAX RES_MULT / 2
 #define START_POS_MIN 500l
-#define TRANSLATION_SPEED 0.000111f
+#define TRANSLATION_SPEED 0.000021f
 #define SLEEP_MICRO 1000
 
 static pthread_t thread;
