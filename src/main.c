@@ -1,13 +1,15 @@
 #include "graphics.h"
+#include "particle.h"
 
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <pthread.h>
 #include <signal.h>
 #include <X11/Xlib.h>
 
-static bool volatile interrupted = false;
+bool volatile interrupted = false;
 
 void signal_handler(int signal) {
     if(signal == SIGINT || signal == SIGKILL) {
@@ -65,6 +67,11 @@ int main(void) {
 		return 1;
 	}
 
+    if(!particle_spawn()) {
+        fputs("Failed to spawn particle thread", stderr);
+        free(texdata);
+        return 1;
+    }
 
     while(!interrupted && !gl_window_should_close()) {
         gl_clear();
@@ -75,6 +82,11 @@ int main(void) {
 
     gl_terminate();
     free(texdata);
+
+    if(!particle_join()) {
+        fputs("Failed to join particle thread", stderr);
+        return 1;
+    }
 
     return 0;
 }
