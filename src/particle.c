@@ -14,11 +14,12 @@
 #define REFLECT(component, incident, normal, angle) \
     (incident)->component - 2.f * angle * (normal)->component
 
-#define PARTICLE_DIR_MAX 5
-#define START_POS_MIN -500
-#define START_POS_MAX  500
-#define RES_MULT 1000.f
-#define TRANSLATION_SPEED 0.000004f
+#define RES_MULT 1000000.f
+#define PARTICLE_DIR_MAX  5
+#define START_POS_MAX RES_MULT / 2
+#define START_POS_MIN 500l
+#define TRANSLATION_SPEED 0.000111f
+#define SLEEP_MICRO 1000
 
 static pthread_t thread;
 
@@ -49,7 +50,7 @@ static struct complexptf complexpti2f(struct complexpti const *i) {
 }
 
 static inline int32_t rand32_in_range(int32_t low, int32_t high) {
-    return low + (int32_t)((((double)rand()) / (double)RAND_MAX) * high);
+    return low + (int32_t)((((double)rand()) / (double)RAND_MAX) * (high - low));
 }
 
 static void collide(struct complexptf const *pos, struct complexptf *dir) {
@@ -79,7 +80,6 @@ static void move(void) {
 
     float dist = complexptf_dist(&pos, &origin);
     if(dist > JULIA_RADIUS) {
-        puts("Collide");
         collide(&pos, &dir);
     }
     else {
@@ -97,18 +97,23 @@ static void *handle_particle(void *args) {
     while(particle_alive) {
         update_delta_time();
         move();
-        usleep(1000000);
+        usleep(SLEEP_MICRO);
     }
     return NULL;
 }
 
 bool particle_spawn(void) {
     srand(time(NULL));
-    particle.dir.re = rand32_in_range(0, PARTICLE_DIR_MAX);
-    particle.dir.im = rand32_in_range(0, PARTICLE_DIR_MAX);
-
-    particle.pos.re = rand32_in_range(START_POS_MIN, START_POS_MAX);
-    particle.pos.im = rand32_in_range(START_POS_MIN, START_POS_MAX);
+    
+    /* Ensure particle isn't spawned on on of the coordinate axes */
+    do {
+        particle.dir.re = rand32_in_range(-PARTICLE_DIR_MAX, PARTICLE_DIR_MAX);
+        particle.dir.im = rand32_in_range(-PARTICLE_DIR_MAX, PARTICLE_DIR_MAX);
+        particle.pos.re = rand32_in_range(-START_POS_MAX, START_POS_MAX);
+        particle.pos.im = rand32_in_range(-START_POS_MAX, START_POS_MAX);
+    } while((labs(particle.pos.re) < START_POS_MIN) ||
+            (labs(particle.pos.im) < START_POS_MIN) ||
+            (labs(particle.dir.re) == labs(particle.dir.im)));
 
     gettimeofday(&delta_start, NULL);
     gettimeofday(&delta_stop, NULL);
