@@ -1,7 +1,6 @@
 #include "cmpxchg.h"
 #include "graphics.h"
 
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,10 +23,10 @@ static GLFWwindow *window;
 static GLuint texid, shaderid;
 
 static const GLfloat vertices[] = {
-    -1.f, -1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f,
-     1.f, -1.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f,
-     1.f,  1.f, 0.f, 0.f, 0.f, 1.f, 1.f, 1.f,
-    -1.f,  1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 1.f
+    -1.f, -1.f, 0.f, 0.f, 0.f,
+     1.f, -1.f, 0.f, 1.f, 0.f,
+     1.f,  1.f, 0.f, 1.f, 1.f,
+    -1.f,  1.f, 0.f, 0.f, 1.f
 };
 
 static const GLuint indices[] = {
@@ -83,11 +82,9 @@ static void setup_renderer(void) {
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glEnableVertexAttribArray(2);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(vertices[0]), (void*)0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(vertices[0]), (void*)(3 * sizeof(vertices[0])));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(vertices[0]), (void*)(6 * sizeof(vertices[0])));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(vertices[0]), (void*)0);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(vertices[0]), (void*)(3 * sizeof(vertices[0])));
 
     glGenBuffers(1, &idx_buf);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buf);
@@ -175,7 +172,7 @@ void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-bool gl_create_window(unsigned width, unsigned height) {
+bool gl_create_window(uint32_t width, uint32_t height) {
     atomic_writeu32(&win_width, width);
     atomic_writeu32(&win_height, height);
     glViewport(0, 0, width, height);
@@ -238,7 +235,7 @@ bool gl_init(unsigned char *texdata) {
 }
 
 void gl_update_texture(unsigned char *texdata) {
-    static unsigned width = 0, height = 0;
+    static uint32_t width = 0, height = 0;
 
     glBindTexture(GL_TEXTURE_2D, texid);
     if(win_width != width || win_height != height) {
