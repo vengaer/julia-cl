@@ -81,12 +81,12 @@ int main(void) {
     free(texdata);
     julia_cleanup();
 
-    if(!CMPXCHG_LOCK_FREE) {
-        CMPXCHG_CLEANUP(void);
-    }
-
     if(!particle_join()) {
         fputs("Failed to join particle thread\n", stderr);
+    }
+
+    if(!CMPXCHG_LOCK_FREE) {
+        CMPXCHG_CLEANUP(void);
     }
 
     return 0;
