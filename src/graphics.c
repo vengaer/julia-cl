@@ -246,18 +246,9 @@ bool gl_init(uint32_t width, uint32_t height) {
 }
 
 void gl_update_texture(unsigned char *texdata) {
-    static uint32_t width = 0, height = 0;
 
     glBindTexture(GL_TEXTURE_2D, texid);
-    if(win_width != width || win_height != height) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, fb_width, fb_height, 0, GL_RGB, GL_UNSIGNED_BYTE, texdata);
-
-        width = win_width;
-        height = win_height;
-    }
-    else {
-        glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, fb_width, fb_height, GL_RGB, GL_UNSIGNED_BYTE, texdata);
-    }
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, fb_width, fb_height, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, texdata);
     glBindTexture(GL_TEXTURE_2D, 0);
 }
 

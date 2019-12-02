@@ -48,8 +48,9 @@ R"(
             }
         }
         
-        result[idx * 3]     = compute_color(i, iters, 2);
-        result[idx * 3 + 1] = compute_color(i, iters, 4);
-        result[idx * 3 + 2] = compute_color(i, iters, 8);
+        result[idx * 4]     = compute_color(i, iters, 8);
+        result[idx * 4 + 1] = compute_color(i, iters, 4);
+        result[idx * 4 + 2] = compute_color(i, iters, 2);
+        result[idx * 4 + 3] = 255;
     }
 )"

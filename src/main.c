@@ -58,7 +58,7 @@ int main(void) {
         return 1;
     }
 
-    unsigned char *texdata = malloc(width * height * 3 * sizeof(unsigned char));
+    unsigned char *texdata = malloc(width * height * 4 * sizeof(unsigned char));
     struct complexptf ppos;
 
     while(!interrupted && !gl_window_should_close()) {

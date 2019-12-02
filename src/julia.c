@@ -102,7 +102,7 @@ static bool setup_buffers(void) {
         return false;
     }
 
-    result = clCreateBuffer(context, CL_MEM_WRITE_ONLY, width * height * 3, NULL, &err);
+    result = clCreateBuffer(context, CL_MEM_WRITE_ONLY, width * height * 4, NULL, &err);
     if(err != CL_SUCCESS) {
         fputs("Failed to allocate im buffer\n", stderr);
         return false;
@@ -222,6 +222,6 @@ bool julia_run_kernel(unsigned char *out) {
 
     clFinish(queue);
     
-    clEnqueueReadBuffer(queue, result, CL_TRUE, 0, width * height * 3, out, 0, NULL, NULL);
+    clEnqueueReadBuffer(queue, result, CL_TRUE, 0, width * height * 4, out, 0, NULL, NULL);
     return true;
 }
