@@ -12,8 +12,8 @@
 
 #define IGNORE(x) (void)(x)
 
-#define BYTESIZE(buf) \
-    sizeof((buf)) * sizeof((buf[0]))
+#define ARRAYLEN(x) \
+    (sizeof((x)) / sizeof((x[0])))
 
 static char const *vert_shader_source =
     #include "shader/basic.vert"
@@ -86,7 +86,7 @@ static void setup_renderer(void) {
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-    glBufferData(GL_ARRAY_BUFFER, BYTESIZE(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof vertices, vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
@@ -96,7 +96,7 @@ static void setup_renderer(void) {
 
     glGenBuffers(1, &idx_buf);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, idx_buf);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, BYTESIZE(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof indices, indices, GL_STATIC_DRAW);
 
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -270,7 +270,7 @@ void gl_render(void) {
     glBindTexture(GL_TEXTURE_2D, texid);
     glUseProgram(shaderid);
     glBindVertexArray(vao);
-    glDrawElements(GL_TRIANGLES, sizeof indices, GL_UNSIGNED_INT, (void*)0);
+    glDrawElements(GL_TRIANGLES, ARRAYLEN(indices), GL_UNSIGNED_INT, (void*)0);
     glBindVertexArray(0);
     glUseProgram(0);
     glBindTexture(GL_TEXTURE_2D, 0);
