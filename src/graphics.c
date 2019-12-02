@@ -41,8 +41,6 @@ static uint32_t volatile win_width, win_height;
 static uint32_t volatile fb_width, fb_height;
 static GLuint vao, vbo, idx_buf;
 
-static bool data_initialized = false;
-
 static struct timeval delta_start, delta_stop;
 static float delta_time;
 
@@ -181,7 +179,7 @@ static void framebuffer_size_callback(GLFWwindow *win, int width, int height) {
     atomic_writeu32(&fb_height, height);
 }
 
-bool gl_create_window(uint32_t width, uint32_t height) {
+static bool create_window(uint32_t width, uint32_t height) {
     atomic_writeu32(&win_width, width);
     atomic_writeu32(&win_height, height);
     glViewport(0, 0, width, height);
@@ -203,7 +201,8 @@ bool gl_create_window(uint32_t width, uint32_t height) {
 
     if(glewInit() != GLEW_OK) {
         fputs("Failed to initialize glew\n", stderr);
-        gl_terminate();
+        glfwTerminate();
+        glfwDestroyWindow(window);
         return false;
     }
 
@@ -217,11 +216,9 @@ bool gl_create_window(uint32_t width, uint32_t height) {
 }
 
 void gl_terminate(void) {
-    if(data_initialized) {
-        glDeleteProgram(shaderid);
-        cleanup_renderer();
-        destroy_texture();
-    }
+    glDeleteProgram(shaderid);
+    cleanup_renderer();
+    destroy_texture();
     glfwTerminate();
     glfwDestroyWindow(window);
 }
@@ -239,13 +236,12 @@ void gl_update(void) {
     glfwPollEvents();
 }
 
-bool gl_init() {
-    if(!setup_shaders()) {
+bool gl_init(uint32_t width, uint32_t height) {
+    if(!create_window(width, height) || !setup_shaders()) {
         return false;
     }
     create_texture();
     setup_renderer();
-    data_initialized = true;
     return true;
 }
 

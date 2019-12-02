@@ -4,13 +4,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-bool gl_create_window(uint32_t width, uint32_t height);
+bool gl_init(uint32_t width, uint32_t height);
 void gl_terminate(void);
 bool gl_window_should_close(void);
 void gl_clear(void);
 void gl_update(void);
 
-bool gl_init();
 void gl_update_texture(unsigned char *texdata);
 void gl_render(void);
 

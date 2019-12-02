@@ -33,13 +33,7 @@ int main(void) {
         return 1;
     }
 
-    if(!gl_create_window(width, height)) {
-        julia_cleanup();
-        return 1;
-    }
-
-    if(!gl_init()) {
-        gl_terminate();
+    if(!gl_init(width, height)) {
         julia_cleanup();
 		return 1;
 	}
