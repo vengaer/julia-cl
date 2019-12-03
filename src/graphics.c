@@ -201,8 +201,8 @@ static bool create_window(uint32_t width, uint32_t height) {
 
     if(glewInit() != GLEW_OK) {
         fputs("Failed to initialize glew\n", stderr);
-        glfwTerminate();
         glfwDestroyWindow(window);
+        glfwTerminate();
         return false;
     }
 
@@ -219,8 +219,8 @@ void gl_terminate(void) {
     glDeleteProgram(shaderid);
     cleanup_renderer();
     destroy_texture();
-    glfwTerminate();
     glfwDestroyWindow(window);
+    glfwTerminate();
 }
 
 bool gl_window_should_close(void) {
