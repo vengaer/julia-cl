@@ -12,11 +12,11 @@
 
 #define MAX_ITERS 1024
 
-bool volatile interrupted = false;
+sig_atomic_t volatile interrupted = 0;
 
 void signal_handler(int signal) {
     if(signal == SIGINT || signal == SIGKILL) {
-        interrupted = true;
+        interrupted = 1;
     }
 }
 

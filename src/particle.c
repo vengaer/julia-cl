@@ -4,6 +4,7 @@
 #include "particle.h"
 
 #include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -24,7 +25,7 @@
 
 static pthread_t thread;
 
-static bool volatile particle_alive = true;
+static int32_t volatile particle_alive = 1;
 
 static struct timeval delta_start, delta_stop;
 static float delta_time = 0.f;
@@ -117,7 +118,7 @@ bool particle_spawn(void) {
 }
 
 bool particle_join(void) {
-    particle_alive = false;
+    atomic_write32(&particle_alive, 0);
     return pthread_join(thread, NULL);
 }
 
