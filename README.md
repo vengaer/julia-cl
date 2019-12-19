@@ -2,7 +2,7 @@
 
 GPU-accelerated visualization of the quadratic [Julia set](https://en.wikipedia.org/wiki/Julia_set). Pixel values are computed using OpenCL and the result visualized using OpenGL. The input is gotten from a particle moving inside the circle $`Re(z)^2 + Im(z)^2 = 4`$ in the complex plane.
 
-[![Build Status](https://gitlab.com/vilhelmengstrom/julia-cl/badges/master/build.svg)](https://gitlab.com/vilhelmengstrom/julia-cl/commits/master)
+[![Build Status](https://gitlab.com/vilhelmengstrom/julia-cl/badges/master/pipeline.svg)](https://gitlab.com/vilhelmengstrom/julia-cl/commits/master)
 
 ## Dependencies
 - GNU C (for raw string support)
